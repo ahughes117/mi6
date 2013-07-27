@@ -2,6 +2,6 @@
 
 require_once('src/ip.php');
 
-insert_ip();
+$ip = insert_ip();
 
 ?>
