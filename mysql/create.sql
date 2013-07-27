@@ -71,10 +71,14 @@ CREATE  TABLE IF NOT EXISTS `ip` (
   `ip_mask` VARCHAR(16) NULL ,
   `Processed` TINYINT NOT NULL DEFAULT 0 ,
   `Hostname` VARCHAR(255) NULL ,
+  `City` VARCHAR(128) NULL ,
+  `Region` VARCHAR(128) NULL ,
+  `Country` VARCHAR(64) NULL ,
+  `CountryCode` VARCHAR(2) NULL ,
   `Latitude` DOUBLE NULL ,
   `Longitude` DOUBLE NULL ,
-  `Timezone` INT NULL ,
-  `PostCode` VARCHAR(10) NULL ,
+  `PostCode` VARCHAR(30) NULL ,
+  `TimeZone` VARCHAR(8) NULL ,
   `DateCreated` TIMESTAMP NULL ,
   `_dateModified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`ip`, `agent`, `domain`) ,
@@ -106,6 +110,8 @@ CREATE  TABLE IF NOT EXISTS `city` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
+USE `mi6` ;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
