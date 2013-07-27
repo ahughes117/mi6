@@ -22,8 +22,8 @@ class Ip {
 function insert_ip() {
     global $con;
     $query = "
-        INSERT INTO ip (ip, agent, DateCreated) VALUES 
-        (?, ?, CURRENT_TIMESTAMP) ";
+        INSERT INTO ip (ip, agent, domain, DateCreated) VALUES 
+        (?, ?, ?, CURRENT_TIMESTAMP) ";
     
     try {
         $stmt = $con->prepare_statement($query);
@@ -32,7 +32,9 @@ function insert_ip() {
         if(!$stmt)
             throw new Exception();
         
-        $stmt->bind_param("ss", $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT']);
+        $domain = $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+        $stmt->bind_param("sss", $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT'],
+                $domain);
         $stmt->execute();
         
         $id = $con->inserted_id();

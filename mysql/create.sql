@@ -67,6 +67,7 @@ DROP TABLE IF EXISTS `ip` ;
 CREATE  TABLE IF NOT EXISTS `ip` (
   `ip` VARCHAR(16) NOT NULL ,
   `agent` VARCHAR(200) NOT NULL ,
+  `domain` VARCHAR(255) NOT NULL ,
   `ip_mask` VARCHAR(16) NULL ,
   `Processed` TINYINT NOT NULL DEFAULT 0 ,
   `Hostname` VARCHAR(255) NULL ,
@@ -76,7 +77,7 @@ CREATE  TABLE IF NOT EXISTS `ip` (
   `PostCode` VARCHAR(10) NULL ,
   `DateCreated` TIMESTAMP NULL ,
   `_dateModified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
-  PRIMARY KEY (`ip`, `agent`) ,
+  PRIMARY KEY (`ip`, `agent`, `domain`) ,
   INDEX `fk_ip_ip_mask_idx` (`ip_mask` ASC) ,
   CONSTRAINT `fk_ip_ip_mask`
     FOREIGN KEY (`ip_mask` )
