@@ -111,6 +111,25 @@ CREATE  TABLE IF NOT EXISTS `city` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `partner`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `partner` ;
+
+CREATE  TABLE IF NOT EXISTS `partner` (
+  `partnerID` INT NOT NULL AUTO_INCREMENT ,
+  `url` VARCHAR(255) NOT NULL ,
+  `user` VARCHAR(45) NOT NULL ,
+  `pass` VARCHAR(45) NOT NULL ,
+  `schema` VARCHAR(45) NOT NULL ,
+  `table` VARCHAR(45) NOT NULL ,
+  `type` VARCHAR(45) NULL ,
+  `DateCreated` TIMESTAMP NULL ,
+  `_dateModified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
+  PRIMARY KEY (`partnerID`) )
+ENGINE = InnoDB;
+
 USE `mi6` ;
 
 
