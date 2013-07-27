@@ -69,6 +69,15 @@ class MySQL {
     public function inserted_id() {
         return $this->mysqli->insert_id;
     }
+    
+    /**
+     * Attempts to close a connection
+     * 
+     * @return type
+     */
+    public function close_connection() {
+        return $this->mysqli->close();
+    }
 
 }
 

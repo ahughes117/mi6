@@ -43,6 +43,8 @@ function insert_ip() {
             throw new Exception();
         
         $stmt->close();
+        $con->close_connection();
+        
         return $id;
     } catch(Exception $x) {
         return false;
