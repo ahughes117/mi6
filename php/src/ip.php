@@ -62,30 +62,73 @@ function acquire_ip_details($ip_addr) {
  */
 function insert_ip() {
     global $con;
-    //if address exists, skip all this and update hits
-
     $ip = acquire_ip_details($_SERVER['REMOTE_ADDR']);
 
-
-    $query = "
+    //if address exists, just update hits.
+    if (ip_exists($ip->ip, $ip->domain, $ip->agent)) {
+        update_hits($ip->ip, $ip->domain, $ip->agent);
+    } else {
+        $query = "
         INSERT INTO ip (ip, agent, domain, Hostname, City, Region, Country, 
         CountryCode, Longitude, Latitude, DateCreated) VALUES 
         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) ";
 
-    try {
-        $stmt = $con->prepare_statement($query);
+        try {
+            $stmt = $con->prepare_statement($query);
 
-        //checking if query well written
-        if (!$stmt)
-            throw new Exception();
+            //checking if query well written
+            if (!$stmt)
+                throw new Exception();
 
-        $stmt->bind_param("ssssssssss", $ip->ip, $ip->agent, $ip->domain, $ip->hostname, $ip->city, $ip->region, $ip->country, $ip->country_code, $ip->longitude, $ip->latitude);
-        $stmt->execute();
+            $stmt->bind_param("ssssssssdd", $ip->ip, $ip->agent, $ip->domain, $ip->hostname, $ip->city, $ip->region, $ip->country, $ip->country_code, $ip->longitude, $ip->latitude);
+            $stmt->execute();
 
-        $stmt->close();
-        $con->close_connection();
-    } catch (Exception $x) {
-        $con->close_connection();
+            $stmt->close();
+            $con->close_connection();
+        } catch (Exception $x) {
+            $con->close_connection();
+        }
+    }
+    return $ip;
+}
+
+/**
+ * Inserts a requested IP with full details in the database
+ * 
+ * @global type $con
+ * @param type $ip_addr
+ */
+function insert_request($ip_addr) {
+    global $con;
+
+    $ip = acquire_ip_details($ip_addr);
+    $ip->request = 1;
+    $ip->request_source = $_SERVER['REMOTE_ADDR'];
+
+    //if address exists, just update hits.
+    if (ip_exists($ip->ip, $ip->domain, $ip->agent)) {
+        update_hits($ip->ip, $ip->domain, $ip->agent);
+    } else {
+        $query = "
+            INSERT INTO ip (ip, agent, domain, Request, RequestSource, Hostname, 
+            City, Region, Country, CountryCode, Latitude, Longitude, DateCreated) VALUES 
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) ";
+
+        try {
+            $stmt = $con->prepare_statement($query);
+
+            //checking if query well written
+            if (!$stmt)
+                throw new Exception();
+
+            $stmt->bind_param("sssissssssssssdd", $ip->ip, $ip->agent, $ip->domain, $ip->request, $ip->request_source, $ip->hostname, $ip->city, $ip->region, $ip->country, $ip->country_code, $ip->latitude, $ip->longitude);
+            $stmt->execute();
+
+            $stmt->close();
+            $con->close_connection();
+        } catch (Exception $x) {
+            $con->close_connection();
+        }
     }
     return $ip;
 }
@@ -108,11 +151,11 @@ function ip_exists($ip_addr, $domain, $agent) {
 
     try {
         $stmt = $con->prepare_statement($query);
-        
+
         //checking if query well written
-        if(!$stmt)
+        if (!$stmt)
             throw new Exception();
-        
+
         $stmt->bind_param("sss", $ip_addr, $domain, $agent);
 
         $stmt->execute();
@@ -124,7 +167,7 @@ function ip_exists($ip_addr, $domain, $agent) {
             else
                 $exists = false;
         }
-        
+
         $stmt->close();
         return $exists;
     } catch (Exception $x) {
@@ -142,54 +185,55 @@ function ip_exists($ip_addr, $domain, $agent) {
  * @return boolean
  * @throws Exception
  */
-function update_hits($ip, $agent, $domain) {
+function update_hits($ip, $domain, $agent) {
     global $con;
-    
+
     $sel_query = "
         SELECT Hits 
         FROM ip 
         WHERE ip = ? AND agent = ? AND domain = ? ";
-    
+
     $upd_query = "
         UPDATE ip 
         SET Hits = ? 
         WHERE ip = ? AND agent = ? AND domain = ? ";
-    
+
     try {
         //first acquiring current hits
         $stmt = $con->prepare_statement($sel_query);
-        
+
         //checking if query well written
-        if(!$stmt)
+        if (!$stmt)
             throw new Exception();
-        
-        
+
+
         $stmt->execute();
-        
+
         $stmt->bind_result($hits);
-        while($stmt->fetch())
+        while ($stmt->fetch())
             $hits = $hits;
-        
+
         $stmt->close();
         $stmt = null;
-        
+
         //now updating them
         $stmt = $con->prepare_statement($upd_query);
-        
+
         //checking if query well written again
-        if(!$stmt)
+        if (!$stmt)
             throw new Exception();
-        
+
         $stmt->bind_param("isss", $hits, $ip, $agent, $domain);
-        
+
         $stmt->execute();
-        if($stmt->affected_rows != 1)
+        if ($stmt->affected_rows != 1)
             throw new Exception();
-        
+
         $stmt->close();
         return true;
-    } catch(Exception $x) {
+    } catch (Exception $x) {
         return false;
     }
 }
+
 ?>
