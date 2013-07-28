@@ -19,8 +19,13 @@ require_once('tracker.php');
         if (isset($_GET['ip'])) {
             echo "<p>//Below you can find the info you are looking for, brought to you by <a href='https://github.com/ahughes117/mi6' target='_blank'><strong>MI6 IP Tracker</strong></a></p>";
             echo "<p>//The ip of the request is <strong>{$_SERVER['REMOTE_ADDR']}</strong>. Here is the info you are looking for:</p><br>";
-            print_ip($request_ip);
-            echo "<p>Your info is: </p>";
+            
+            if (isset($request_ip))
+                print_ip($request_ip);
+            else
+                echo "<p><strong>The ip you provided was invalid.</strong></p><br>";
+            
+            echo "<p><i>Your info is: </i></p>";
         } else {
             echo "<p>//You've just been tracked by <a href='https://github.com/ahughes117/mi6' target='_blank'><strong>MI6 IP Tracker</strong></a></p><br>";
         }
