@@ -15,17 +15,20 @@ require_once('tracker.php');
     <body class="fd_content">
         <p><img class="fd_img_center" src="misc/header.jpg" width=735 height=127 /></p>
 
+        <form id='ip_form' name='ip_form' method='post' action=''>
+            <p>//Perform an IP or a reverse IP lookup by entering an IP address or a hostname:</p> 
+            <p><blockquote><input type="text" name="ip" id="ip" /> <input type="submit" name="submit" id="submit" value="GO!"/></blockquote></p>
+        </form><br>
         <?php
-        if (isset($_GET['ip'])) {
+        if (isset($_POST['ip'])) {
             echo "<p>//Below you can find the info you are looking for, brought to you by <a href='https://github.com/ahughes117/mi6' target='_blank'><strong>MI6 IP Tracker</strong></a></p>";
-            echo "<p>//The ip of the request is <strong>{$_SERVER['REMOTE_ADDR']}</strong>. Here is the info you are looking for:</p><br>";
-            
+                        
             if (isset($request_ip))
                 print_ip($request_ip);
             else
                 echo "<p><strong>The ip you provided was invalid.</strong></p><br>";
             
-            echo "<p><i>Your info is: </i></p>";
+            echo "<p>//Your info is: </p>";
         } else {
             echo "<p>//You've just been tracked by <a href='https://github.com/ahughes117/mi6' target='_blank'><strong>MI6 IP Tracker</strong></a></p><br>";
         }
@@ -45,6 +48,7 @@ require_once('tracker.php');
         }
         ?>
 
+        <p><br><i>Created and maintened by <a href="mailto:ahughes@ahughes.org">Alex Hughes</a>. Suggestions and contributions are always welcome. You know where you can find me.</i></p>
     </body>
 </html>
 

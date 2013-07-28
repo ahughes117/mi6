@@ -1,12 +1,14 @@
 USE `ahughes_mi6`;
 
 DROP TABLE IF EXISTS `ip`;
-CREATE  TABLE IF NOT EXISTS `ip` (
+CREATE  TABLE IF NOT EXISTS `mi6`.`ip` (
   `ip` VARCHAR(16) NOT NULL ,
   `agent` VARCHAR(200) NOT NULL ,
   `domain` VARCHAR(255) NOT NULL ,
-  `ip_mask` VARCHAR(16) NULL ,
   `Processed` TINYINT NOT NULL DEFAULT 0 ,
+  `Hits` BIGINT NOT NULL DEFAULT 0 ,
+  `Request` TINYINT NOT NULL DEFAULT 0 ,
+  `RequestSource` VARCHAR(16) NULL ,
   `Hostname` VARCHAR(255) NULL ,
   `City` VARCHAR(128) NULL ,
   `Region` VARCHAR(128) NULL ,
