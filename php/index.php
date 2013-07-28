@@ -1,4 +1,8 @@
 <?php
+//remove for production version
+error_reporting(E_ALL | E_STRICT);
+ini_set("display_errors", "1");
+
 require_once('tracker.php');
 ?>
 <html>
@@ -16,14 +20,14 @@ require_once('tracker.php');
             echo "<p>//Below you can find the info you are looking for, brought to you by <a href='https://github.com/ahughes117/mi6' target='_blank'><strong>MI6 IP Tracker</strong></a></p>";
             echo "<p>//The ip of the request is <strong>{$_SERVER['REMOTE_ADDR']}</strong>. Here is the info you are looking for:</p><br>";
             print_ip($request_ip);
-            echo "<p>Your info is: </p><br>";
+            echo "<p>Your info is: </p>";
         } else {
             echo "<p>//You've just been tracked by <a href='https://github.com/ahughes117/mi6' target='_blank'><strong>MI6 IP Tracker</strong></a></p><br>";
         }
         print_ip($my_ip);
 
         function print_ip($ip) {
-            echo "<p><strong>IP Address:</strong> {$ip->ip}</p>";
+            echo "<blockquote><p><strong>IP Address:</strong> {$ip->ip}</p>";
             echo "<p><strong>Host:</strong> {$ip->hostname}</p>";
             echo "<p><strong>City:</strong> {$ip->city}</p>";
             echo "<p><strong>Region:</strong> {$ip->region}</p>";
@@ -32,7 +36,7 @@ require_once('tracker.php');
             echo "<p><strong>Longitude:</strong> {$ip->longitude}</p>";
             echo "<p><strong>Latitude:</strong> {$ip->latitude}</p>";
             echo "<p><strong>Agent:</strong> {$ip->agent}</p>";
-            echo "<p><strong>Domain:</strong> {$ip->domain}";
+            echo "<p><strong>Domain:</strong> {$ip->domain}</p><br></blockquote>";
         }
         ?>
 

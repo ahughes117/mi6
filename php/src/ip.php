@@ -84,9 +84,8 @@ function insert_ip() {
             $stmt->execute();
 
             $stmt->close();
-            $con->close_connection();
         } catch (Exception $x) {
-            $con->close_connection();
+            
         }
     }
     return $ip;
@@ -99,16 +98,16 @@ function insert_ip() {
  * @param type $ip_addr
  */
 function insert_request($ip_addr) {
-    global $con;
 
     $ip = acquire_ip_details($ip_addr);
     $ip->request = 1;
     $ip->request_source = $_SERVER['REMOTE_ADDR'];
 
     //if address exists, just update hits.
-    if (ip_exists($ip->ip, $ip->domain, $ip->agent)) {
+    if (ip_exists($ip->ip, $ip->domain, $ip->agent) == true) {
         update_hits($ip->ip, $ip->domain, $ip->agent);
     } else {
+        global $con;
         $query = "
             INSERT INTO ip (ip, agent, domain, Request, RequestSource, Hostname, 
             City, Region, Country, CountryCode, Latitude, Longitude, DateCreated) VALUES 
@@ -121,13 +120,12 @@ function insert_request($ip_addr) {
             if (!$stmt)
                 throw new Exception();
 
-            $stmt->bind_param("sssissssssssssdd", $ip->ip, $ip->agent, $ip->domain, $ip->request, $ip->request_source, $ip->hostname, $ip->city, $ip->region, $ip->country, $ip->country_code, $ip->latitude, $ip->longitude);
+            $stmt->bind_param("sssissssssdd", $ip->ip, $ip->agent, $ip->domain, $ip->request, $ip->request_source, $ip->hostname, $ip->city, $ip->region, $ip->country, $ip->country_code, $ip->latitude, $ip->longitude);
             $stmt->execute();
 
             $stmt->close();
-            $con->close_connection();
         } catch (Exception $x) {
-            $con->close_connection();
+            
         }
     }
     return $ip;
@@ -145,7 +143,7 @@ function ip_exists($ip_addr, $domain, $agent) {
     global $con;
 
     $query = "
-        SELECT count(*) 
+        SELECT ip 
         FROM ip 
         WHERE ip = ? AND agent = ? AND domain = ? ";
 
@@ -156,17 +154,15 @@ function ip_exists($ip_addr, $domain, $agent) {
         if (!$stmt)
             throw new Exception();
 
-        $stmt->bind_param("sss", $ip_addr, $domain, $agent);
+        $stmt->bind_param("sss", $ip_addr, $agent, $domain);
 
         $stmt->execute();
-        $stmt->bind_result($num);
-
-        while ($stmt->fetch()) {
-            if ($num == 1)
-                $exists = true;
-            else
-                $exists = false;
-        }
+        $stmt->store_result();
+        
+        if ($stmt->num_rows == 0)
+            $exists = false;
+        else
+            $exists = true;
 
         $stmt->close();
         return $exists;
@@ -206,12 +202,12 @@ function update_hits($ip, $domain, $agent) {
         if (!$stmt)
             throw new Exception();
 
-
+        $stmt->bind_param("sss", $ip, $agent, $domain);
         $stmt->execute();
 
-        $stmt->bind_result($hits);
+        $stmt->bind_result($hitsB);
         while ($stmt->fetch())
-            $hits = $hits;
+            $hits = ((int) $hitsB) + 1;
 
         $stmt->close();
         $stmt = null;
