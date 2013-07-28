@@ -12,8 +12,8 @@ public class Ip extends Entity {
     private String ip;
     private String agent;
     private String domain;
-    private String ipMask;
-    private int processed = -1;
+    private int processed = NIL;
+    private int hits = NIL;
     private String hostname;
     private String city;
     private String region;
@@ -26,11 +26,11 @@ public class Ip extends Entity {
     private Timestamp dateCreated;
     private Timestamp dateModified;
 
-    public Ip(String ip, String agent, String domain, String ipMask, int processed, String hostname, String city, String region, String country, String countryCode, double latitude, double longitude, String postCode, String timezone, Timestamp dateCreated, Timestamp dateModified) {
+    public Ip(String ip, String agent, String domain, int hits, int processed, String hostname, String city, String region, String country, String countryCode, double latitude, double longitude, String postCode, String timezone, Timestamp dateCreated, Timestamp dateModified) {
         this.ip = ip;
         this.agent = agent;
         this.domain = domain;
-        this.ipMask = ipMask;
+        this.hits = hits;
         this.processed = processed;
         this.hostname = hostname;
         this.city = city;
@@ -69,12 +69,12 @@ public class Ip extends Entity {
         this.domain = domain;
     }
 
-    public String getIpMask() {
-        return ipMask;
+    public int getHits() {
+        return hits;
     }
 
-    public void setIpMask(String ipMask) {
-        this.ipMask = ipMask;
+    public void setHits(int hits) {
+        this.hits = hits;
     }
 
     public int getProcessed() {
