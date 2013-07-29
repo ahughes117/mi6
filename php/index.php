@@ -48,7 +48,7 @@ require_once('tracker.php');
         }
         ?>
 
-        <p><br><i>Created and maintened by <a href="mailto:ahughes@ahughes.org">Alex Hughes</a>. Suggestions and contributions are always welcome. You know where you can find me.</i></p>
+        <p><br><i>Created and maintened by <a href="mailto:ahughes@ahughes.org">Alex Hughes</a>. Suggestions and contributions are always welcome. You know where you can <a href="http://ahughes.org" target="_blank">find me</a>.</i></p>
     </body>
 </html>
 
