@@ -22,6 +22,11 @@ body {
         margin-right: auto;
 }
 
+.pre {
+   font-family: "courier new", courier, monospace;
+   font-size: 15px;
+}
+
 a:link {
         color:#FFC;
 }
