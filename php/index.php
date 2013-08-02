@@ -1,7 +1,7 @@
 <?php
 //remove for production version
-error_reporting(E_ALL | E_STRICT);
-ini_set("display_errors", "1");
+//error_reporting(E_ALL | E_STRICT);
+//ini_set("display_errors", "1");
 
 require_once('tracker.php');
 require_once('whois.php');
