@@ -14,6 +14,8 @@ public class Ip extends Entity {
     private String domain;
     private int processed = NIL;
     private int hits = NIL;
+    private int request;
+    private String requestSource;
     private String hostname;
     private String city;
     private String region;
@@ -26,11 +28,13 @@ public class Ip extends Entity {
     private Timestamp dateCreated;
     private Timestamp dateModified;
 
-    public Ip(String ip, String agent, String domain, int hits, int processed, String hostname, String city, String region, String country, String countryCode, double latitude, double longitude, String postCode, String timezone, Timestamp dateCreated, Timestamp dateModified) {
+    public Ip(String ip, String agent, String domain, int processed, int hits, int request, String requestSource, String hostname, String city, String region, String country, String countryCode, double latitude, double longitude, String postCode, String timezone, Timestamp dateCreated, Timestamp dateModified) {
         this.ip = ip;
         this.agent = agent;
         this.domain = domain;
         this.hits = hits;
+        this.request = request;
+        this.requestSource = requestSource;
         this.processed = processed;
         this.hostname = hostname;
         this.city = city;
@@ -75,6 +79,22 @@ public class Ip extends Entity {
 
     public void setHits(int hits) {
         this.hits = hits;
+    }
+
+    public int getRequest() {
+        return request;
+    }
+
+    public void setRequest(int request) {
+        this.request = request;
+    }
+
+    public String getRequestSource() {
+        return requestSource;
+    }
+
+    public void setRequestSource(String requestSource) {
+        this.requestSource = requestSource;
     }
 
     public int getProcessed() {
