@@ -259,6 +259,7 @@ public class IpDL extends DataLayer {
                     aR.getString("Timezone"),
                     aR.getTimestamp("DateCreated"),
                     aR.getTimestamp("_dateModified"));
+            entityL.add(ip);
         }
 
         return entityL;
