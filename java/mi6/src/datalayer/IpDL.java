@@ -13,6 +13,8 @@ import sql.Connector;
  */
 public class IpDL extends DataLayer {
 
+    private ArrayList<Connector> connections;
+
     public IpDL(Connector aConnector) {
         super(aConnector);
     }
@@ -263,6 +265,77 @@ public class IpDL extends DataLayer {
     }
 
     /**
+     * Gathers hits from all connections and updates the central one.
+     *
+     * @param aHitN
+     * @return
+     * @throws SQLException
+     */
+    public int addHits(Ip anIp, int aHitN) throws SQLException {
+        Ip ip = anIp;
+        int totalHits = 0;
+        PreparedStatement ps;
+
+        String selQ = ""
+                + "SELECT Hits "
+                + "FROM ip "
+                + "WHERE ip = ? AND domain = ? AND agent = ? ";
+
+        String updQ = ""
+                + "UPDATE ip "
+                + "SET Hits = ? "
+                + "WHERE ip = ? AND domain = ? AND agent = ? ";
+
+        //getting hits from central server
+        ps = c.prepareStatement(selQ);
+
+        ps.setString(1, ip.getIp());
+        ps.setString(2, ip.getDomain());
+        ps.setString(3, ip.getAgent());
+
+        ResultSet hitR = ps.executeQuery();
+        while (hitR.next()) {
+            totalHits += hitR.getInt(1);
+        }
+
+        //getting hits from all the agent servers
+        for (Connector con : connections) {
+            ps = con.prepareStatement(selQ);
+
+            ps.setString(1, ip.getIp());
+            ps.setString(2, ip.getDomain());
+            ps.setString(3, ip.getAgent());
+
+            hitR = ps.executeQuery();
+            while (hitR.next()) {
+                totalHits += hitR.getInt(1);
+            }
+            
+            //now setting them to be zero in order not to be counted again next time
+            ps = con.prepareStatement(updQ);
+            
+            ps.setInt(1, 0);
+            ps.setString(2, ip.getIp());
+            ps.setString(3, ip.getDomain());
+            ps.setString(4, ip.getAgent());
+            
+            ps.executeUpdate();
+        }
+        
+        //finally updating total hits centrally
+        ps = c.prepareStatement(updQ);
+        
+        ps.setInt(1, totalHits);
+        ps.setString(2, ip.getIp());
+        ps.setString(3, ip.getDomain());
+        ps.setString(4, ip.getAgent());
+        
+        ps.executeUpdate();
+
+        return totalHits;
+    }
+
+    /**
      * Helper function that checks whether an IP has everything it takes to be
      * updated or deleted
      *
@@ -273,5 +346,13 @@ public class IpDL extends DataLayer {
         if (anIp.getIp() == null || anIp.getAgent() == null || anIp.getDomain() == null) {
             throw new SQLException();
         }
+    }
+
+    public void setConnections(ArrayList<Connector> aConnectionL) {
+        connections = aConnectionL;
+    }
+
+    public ArrayList<Connector> getConnections() {
+        return connections;
     }
 }
