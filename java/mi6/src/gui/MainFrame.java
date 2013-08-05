@@ -1,8 +1,11 @@
 package gui;
 
+import entities.Entity;
+import entities.Partner;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sql.Connector;
@@ -30,7 +33,11 @@ public class MainFrame extends GUI {
             }
         });
         try {
-            partnerCombo = Library.loadPartnerCombo(c);
+            ArrayList<Entity> partners = Library.loadPartnerList(c);
+            for(Entity e : partners) {
+                Partner p = (Partner)e;
+                partnerCombo.addItem(p.getPartnerID() + " - " + p.getUrl());
+            }
         } catch (SQLException ex) {
             MesDial.conError(this);
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);

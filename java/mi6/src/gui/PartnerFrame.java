@@ -114,7 +114,7 @@ public class PartnerFrame extends GUI {
         } else {
             pdl.update();
         }
-        Library.loadPartnerCombo(c);
+        Library.loadPartnerList(c);
     }
 
     private void testCon() {

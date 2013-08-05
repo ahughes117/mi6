@@ -27,23 +27,20 @@ public class Library {
      * @return
      * @throws SQLException
      */
-    public static JComboBox loadPartnerCombo(Connector aCon) throws SQLException, ClassNotFoundException {
+    public static ArrayList<Entity> loadPartnerList(Connector aCon) throws SQLException, ClassNotFoundException {
         ArrayList<Entity> partners;
-        JComboBox agentCombo = new JComboBox();
-
+        
         PartnerDL pdl = new PartnerDL(aCon);
         partners = pdl.fetchList("Url ASC");
         connectionL = new ArrayList();
 
         for (Entity e : partners) {
             Partner p = (Partner) e;
-            //Connector con = new Connector(new DBCredentials(p.getUrl(), p.getUser(), p.getPass(), p.getSchema()));
-
-            //connectionL.add(con);
-            agentCombo.addItem(p.getPartnerID() + " - " + p.getUrl());
+            Connector con = new Connector(new DBCredentials(p.getUrl(), p.getUser(), p.getPass(), p.getSchema()));
+            connectionL.add(con);
         }
 
-        return agentCombo;
+        return partners;
     }
     
     /**
