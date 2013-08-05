@@ -1,51 +1,131 @@
-
 package gui;
 
+import datalayer.PartnerDL;
+import entities.Partner;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import sql.Connector;
+import sql.DBCredentials;
+import util.Library;
 import util.MesDial;
+import util.StrVal;
 
 /**
+ * The Partner Frame.
  *
  * @author alexhughes
  */
-public class AgentFrame extends GUI {
+public class PartnerFrame extends GUI {
+
+    Partner p;
+    PartnerDL pdl;
 
     /**
-     * Creates new form AgentFrame
+     * Creates new form PartnerFrame
      */
-    public AgentFrame(GUI aPreviousFrame, Connector aConnector, int anID) {
+    public PartnerFrame(GUI aPreviousFrame, Connector aConnector, int anID) {
         super(aPreviousFrame, aConnector, anID);
-        
+
         initComponents();
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 shutdown();
             }
         });
-        if(anID != NIL) {
+
+        if (anID != NIL) {
             try {
-                loadAgent();
+                loadPartner();
             } catch (SQLException ex) {
                 MesDial.conError(this);
-                Logger.getLogger(AgentFrame.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PartnerFrame.class.getName()).log(Level.SEVERE, null, ex);
                 shutdown();
             }
+            partnerPanel.setBorder(BorderFactory.createTitledBorder("Edit Partner: " + anID));
             existing = true;
         } else {
+            partnerPanel.setBorder(BorderFactory.createTitledBorder("New Partner"));
+            dateL.setVisible(false);
             existing = false;
         }
-        
+
         super.setFrameLocationCenter();
         this.setVisible(true);
     }
-    
-    private void loadAgent() throws SQLException {
+
+    /**
+     * Parses the partner's fields
+     *
+     * @return
+     */
+    private Partner parsePartner() {
+        p = new Partner(
+                id,
+                urlF.getText(),
+                userF.getText(),
+                new String(passF.getPassword()),
+                schemaF.getText(),
+                tableF.getText(),
+                typeF.getText());
         
+        return p;
+    }
+
+    /**
+     * Loads a Partner
+     *
+     * @throws SQLException
+     */
+    private void loadPartner() throws SQLException {
+        p = new Partner();
+        p.setPartnerID(id);
+
+        pdl = new PartnerDL(c, p);
+        p = (Partner) pdl.fetch();
+
+        urlF.setText(p.getUrl());
+        userF.setText(p.getUser());
+        passF.setText(p.getPass());
+        schemaF.setText(p.getSchema());
+        tableF.setText(p.getTable());
+        typeF.setText(p.getType());
+
+        dateL.setText("Date Created: " + StrVal.formatTimestamp(p.getDateCreated()));
+        if (p.getDateModified() != p.getDateCreated()) {
+            dateL.setText(dateL.getText() + " || Date Modified: " + StrVal.formatTimestamp(p.getDateModified()));
+        }
+    }
+
+    /**
+     * Saves a partner in the db
+     *
+     * @throws SQLException
+     */
+    private void save() throws SQLException, ClassNotFoundException {
+        p = parsePartner();
+        pdl = new PartnerDL(c, p);
+
+        if (!existing) {
+            pdl.insert();
+        } else {
+            pdl.update();
+        }
+        Library.loadPartnerCombo(c);
+    }
+
+    private void testCon() {
+        p = parsePartner();
+        DBCredentials cre = new DBCredentials(p.getUrl(), p.getUser(), p.getPass(), p.getSchema());
+
+        if (Library.testConnection(cre)) {
+            MesDial.conSuccess(this);
+        } else {
+            MesDial.conError(this);
+        }
     }
 
     /**
@@ -57,23 +137,236 @@ public class AgentFrame extends GUI {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        partnerPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        urlF = new javax.swing.JTextField();
+        userF = new javax.swing.JTextField();
+        passF = new javax.swing.JPasswordField();
+        schemaF = new javax.swing.JTextField();
+        tableF = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        typeF = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        okBtn = new javax.swing.JButton();
+        backBtn = new javax.swing.JButton();
+        testBtn = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        dateL = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("Partner");
+
+        partnerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Partner"));
+
+        jLabel1.setText("Schema:");
+
+        jLabel2.setText("URL:");
+
+        jLabel3.setText("Username:");
+
+        jLabel4.setText("Password:");
+
+        jLabel5.setText("Table:");
+
+        jLabel6.setText("Type:");
+
+        javax.swing.GroupLayout partnerPanelLayout = new javax.swing.GroupLayout(partnerPanel);
+        partnerPanel.setLayout(partnerPanelLayout);
+        partnerPanelLayout.setHorizontalGroup(
+            partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(partnerPanelLayout.createSequentialGroup()
+                .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(partnerPanelLayout.createSequentialGroup()
+                        .addGap(16, 16, 16)
+                        .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)))
+                    .addGroup(partnerPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel3))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, partnerPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(typeF)
+                    .addComponent(tableF)
+                    .addComponent(urlF)
+                    .addComponent(userF)
+                    .addComponent(passF)
+                    .addComponent(schemaF))
+                .addContainerGap())
+        );
+        partnerPanelLayout.setVerticalGroup(
+            partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(partnerPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(urlF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(8, 8, 8)
+                .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(userF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addGap(9, 9, 9)
+                .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(passF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(schemaF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tableF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(typeF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        okBtn.setText("OK");
+        okBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                okBtnActionPerformed(evt);
+            }
+        });
+
+        backBtn.setText("<Back");
+        backBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backBtnActionPerformed(evt);
+            }
+        });
+
+        testBtn.setText("Test");
+        testBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                testBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(backBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(testBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                .addComponent(okBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(okBtn)
+                    .addComponent(backBtn)
+                    .addComponent(testBtn))
+                .addContainerGap())
+        );
+
+        jPanel3.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+
+        dateL.setText("Dates");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(dateL)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(0, 6, Short.MAX_VALUE)
+                .addComponent(dateL))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(partnerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(partnerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    
+    private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
+        shutdown();
+    }//GEN-LAST:event_backBtnActionPerformed
+
+    private void testBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testBtnActionPerformed
+        testCon();
+    }//GEN-LAST:event_testBtnActionPerformed
+
+    private void okBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okBtnActionPerformed
+        try {
+            save();
+            MesDial.saveSuccess(this);
+            shutdown();
+        } catch (SQLException ex) {
+            MesDial.conError(this);
+            Logger.getLogger(PartnerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(PartnerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_okBtnActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backBtn;
+    private javax.swing.JLabel dateL;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JButton okBtn;
+    private javax.swing.JPanel partnerPanel;
+    private javax.swing.JPasswordField passF;
+    private javax.swing.JTextField schemaF;
+    private javax.swing.JTextField tableF;
+    private javax.swing.JButton testBtn;
+    private javax.swing.JTextField typeF;
+    private javax.swing.JTextField urlF;
+    private javax.swing.JTextField userF;
     // End of variables declaration//GEN-END:variables
 }

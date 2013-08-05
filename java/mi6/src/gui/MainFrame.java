@@ -1,13 +1,18 @@
-
 package gui;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sql.Connector;
+import util.Library;
+import util.MesDial;
+import util.StrVal;
 
 /**
  * The Main Frame of the application
- * 
+ *
  * @author alexhughes
  */
 public class MainFrame extends GUI {
@@ -17,14 +22,23 @@ public class MainFrame extends GUI {
      */
     public MainFrame(GUI aPFrame, Connector aConnector) {
         super(aPFrame, aConnector, NIL);
-        
+
         initComponents();
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 shutdown();
             }
         });
-        
+        try {
+            partnerCombo = Library.loadPartnerCombo(c);
+        } catch (SQLException ex) {
+            MesDial.conError(this);
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            shutdown();
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         super.setFrameLocationCenter();
         this.setVisible(true);
     }
@@ -57,13 +71,13 @@ public class MainFrame extends GUI {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        agentCombo = new javax.swing.JComboBox();
+        partnerCombo = new javax.swing.JComboBox();
         jLabel3 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         sortingCombo = new javax.swing.JComboBox();
-        jButton2 = new javax.swing.JButton();
-        editAgentBtn = new javax.swing.JButton();
-        delAgentBtn = new javax.swing.JButton();
+        newPartnerBtn = new javax.swing.JButton();
+        editPartnerBtn = new javax.swing.JButton();
+        delPartnerBtn = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -166,15 +180,25 @@ public class MainFrame extends GUI {
 
         jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel3.setText("Select Agent:");
+        jLabel3.setText("Select Partner:");
 
         jLabel6.setText("Sorting by:");
 
-        jButton2.setText("New");
+        newPartnerBtn.setText("New");
+        newPartnerBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newPartnerBtnActionPerformed(evt);
+            }
+        });
 
-        editAgentBtn.setText("Edit");
+        editPartnerBtn.setText("Edit");
+        editPartnerBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editPartnerBtnActionPerformed(evt);
+            }
+        });
 
-        delAgentBtn.setText("Delete");
+        delPartnerBtn.setText("Delete");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -183,7 +207,7 @@ public class MainFrame extends GUI {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(agentCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(partnerCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(sortingCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -191,12 +215,12 @@ public class MainFrame extends GUI {
                             .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2)
+                                .addComponent(newPartnerBtn)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(editAgentBtn)
+                                .addComponent(editPartnerBtn)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(delAgentBtn)))
-                        .addGap(0, 56, Short.MAX_VALUE)))
+                                .addComponent(delPartnerBtn)))
+                        .addGap(0, 46, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -205,11 +229,11 @@ public class MainFrame extends GUI {
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jButton2)
-                    .addComponent(editAgentBtn)
-                    .addComponent(delAgentBtn))
+                    .addComponent(newPartnerBtn)
+                    .addComponent(editPartnerBtn)
+                    .addComponent(delPartnerBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(agentCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(partnerCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -246,9 +270,9 @@ public class MainFrame extends GUI {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton3)
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
@@ -279,7 +303,7 @@ public class MainFrame extends GUI {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -307,17 +331,29 @@ public class MainFrame extends GUI {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void newPartnerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newPartnerBtnActionPerformed
+        //if (!PartnerFrame.instanceAlive) {
+            new PartnerFrame(this, c, NIL);
+        //}
+    }//GEN-LAST:event_newPartnerBtnActionPerformed
+
+    private void editPartnerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editPartnerBtnActionPerformed
+        if (!PartnerFrame.instanceAlive) {
+            int partnerID = StrVal.parseIdFromString((String) partnerCombo.getSelectedItem());
+            if (partnerID != -1) {
+                new PartnerFrame(this, c, partnerID);
+            }
+        }
+    }//GEN-LAST:event_editPartnerBtnActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox agentCombo;
-    private javax.swing.JButton delAgentBtn;
+    private javax.swing.JButton delPartnerBtn;
     private javax.swing.JTextField domainF;
-    private javax.swing.JButton editAgentBtn;
+    private javax.swing.JButton editPartnerBtn;
     private javax.swing.JTextField hitsF;
     private javax.swing.JTextField hostnameF;
     private javax.swing.JTextField ipF;
     private javax.swing.JTable ipTable;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
@@ -333,6 +369,8 @@ public class MainFrame extends GUI {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton newPartnerBtn;
+    private javax.swing.JComboBox partnerCombo;
     private javax.swing.JProgressBar pb;
     private javax.swing.JTextField requestF;
     private javax.swing.JComboBox sortingCombo;

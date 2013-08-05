@@ -1,15 +1,14 @@
-
 package entities;
 
 import java.sql.Timestamp;
 
 /**
  * The Partner Entity Class
- * 
+ *
  * @author alexhughes
  */
 public class Partner extends Entity {
-    
+
     private int partnerID = NIL;
     private String url;
     private String user;
@@ -22,7 +21,7 @@ public class Partner extends Entity {
 
     /**
      * Constructor for fetching partners
-     * 
+     *
      * @param partnerID
      * @param url
      * @param user
@@ -31,7 +30,7 @@ public class Partner extends Entity {
      * @param table
      * @param type
      * @param dateCreated
-     * @param dateModified 
+     * @param dateModified
      */
     public Partner(int partnerID, String url, String user, String pass, String schema, String table, String type, Timestamp dateCreated, Timestamp dateModified) {
         this.partnerID = partnerID;
@@ -47,21 +46,25 @@ public class Partner extends Entity {
 
     /**
      * Constructor for creating new partners
-     * 
+     *
      * @param url
      * @param user
      * @param pass
      * @param schema
      * @param table
-     * @param type 
+     * @param type
      */
-    public Partner(String url, String user, String pass, String schema, String table, String type) {
+    public Partner(int id, String url, String user, String pass, String schema, String table, String type) {
+        this.partnerID = id;
         this.url = url;
         this.user = user;
         this.pass = pass;
         this.schema = schema;
         this.table = table;
         this.type = type;
+    }
+
+    public Partner() {
     }
 
     public int getPartnerID() {

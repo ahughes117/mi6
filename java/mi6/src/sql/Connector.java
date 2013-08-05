@@ -53,6 +53,23 @@ public class Connector {
         connection.setAutoCommit(AUTOCOMMIT);
         printInfo();    //used to print info of the connection
     }
+    
+    public static void testConnection (DBCredentials aCre) throws SQLException, ClassNotFoundException {
+         Class.forName("com.mysql.jdbc.Driver");	//in order to manipulate data on the mySQL server
+
+        java.util.Properties connProperties = new java.util.Properties();
+        connProperties.put(DATABASE_USER, aCre.getUsername());
+        connProperties.put(DATABASE_PASSWORD, aCre.getPassword());
+        connProperties.put(MYSQL_AUTO_RECONNECT, "false");
+        //connProperties.put(MYSQL_MAX_RECONNECTS, "0");
+        connProperties.put("characterEncoding", "utf8");
+        
+        String conString = aCre.getDriver() + aCre.getURL()
+                + aCre.getPort() + aCre.getSchema();
+
+        Connection aCon = DriverManager.getConnection(conString, connProperties);
+        aCon.close();
+    }
 
     public ResultSet sendQuery(String aQuery) throws SQLException {
         ResultSet rs = null;
@@ -152,5 +169,9 @@ public class Connector {
 
     public DBCredentials getCredentials() {
         return credentials;
+    }
+    
+    public String toString() {
+        return credentials.getURL();
     }
 }

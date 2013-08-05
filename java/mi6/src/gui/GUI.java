@@ -13,7 +13,7 @@ import sql.Connector;
  */
 public abstract class GUI extends JFrame {
     
-    protected static boolean instanceAlive;
+    protected static boolean instanceAlive = false;
     protected GUI pFrame;
     protected Connector c;
     protected int id;

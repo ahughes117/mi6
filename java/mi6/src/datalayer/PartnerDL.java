@@ -82,8 +82,8 @@ public class PartnerDL extends DataLayer {
         Partner p = (Partner) e;
 
         String query = ""
-                + "INSERT INTO partner (Url, User, Pass, Schema, Table, Type, DateCreated) VALUES "
-                + "(?, ?, ?, ?, ?, ?, CURRENT_TIMESTAP) ";
+                + "INSERT INTO partner (Url, User, Pass, `Schema`, `Table`, Type, DateCreated) VALUES "
+                + "(?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) ";
 
         PreparedStatement ps = c.prepareStatement(query);
 
@@ -112,9 +112,9 @@ public class PartnerDL extends DataLayer {
         String query = ""
                 + "UPDATE partner SET "
                 + "Url = ?, "
-                + "User = ?, "
+                + "`User` = ?, "
                 + "Pass = ?, "
-                + "Schema = ?, "
+                + "`Schema` = ?, "
                 + "Table = ?, "
                 + "Type = ? "
                 + "WHERE partnerID = ? ";
@@ -167,7 +167,7 @@ public class PartnerDL extends DataLayer {
             entityL.add(p);
         }
 
-        return entities;
+        return entityL;
     }
 
     /**
