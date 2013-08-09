@@ -36,6 +36,7 @@ public class MesDial {
     private static String nullMicroError = "There is not microID in cache. Try saving a draft first and try again.";
     private static String browseNotSupportedError = "The BROWSE operation is not supported on your system";
     private static String awtNotSupportedError = "AWT desktop is not supported on this machine";
+    private static String syncError = "There was a sync error. Sorry, try again.";
     
     //
     private static String deleteQuestion = "Delete?";
@@ -187,5 +188,9 @@ public class MesDial {
     
     public static void rowSelectionError(GUI aFrame) {
         JOptionPane.showMessageDialog(aFrame, rowSelectionError, "Error!", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    public static void syncError(GUI aFrame) {
+        JOptionPane.showMessageDialog(aFrame, syncError, "Error!", JOptionPane.ERROR_MESSAGE);
     }
 }

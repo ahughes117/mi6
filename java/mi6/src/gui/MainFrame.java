@@ -53,11 +53,17 @@ public class MainFrame extends GUI {
         this.setVisible(true);
     }
 
-    private void gatherHits() {
+    private void syncIpAddresses() {
         ipDL = new IpDL (c);
         ipDL.setConnections(Library.connectionL);
         
-        
+        try {
+            ipDL.syncIps();
+            MesDial.saveSuccess(this);
+        } catch (SQLException ex) {
+            MesDial.syncError(this);
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /**
@@ -369,7 +375,7 @@ public class MainFrame extends GUI {
     }//GEN-LAST:event_editPartnerBtnActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        gatherHits();
+        syncIpAddresses();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
