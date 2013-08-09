@@ -1,5 +1,6 @@
 package gui;
 
+import datalayer.IpDL;
 import entities.Entity;
 import entities.Partner;
 import java.awt.event.WindowAdapter;
@@ -20,6 +21,8 @@ import util.StrVal;
  */
 public class MainFrame extends GUI {
 
+    IpDL ipDL;
+    
     /**
      * Creates new form MainFrame
      */
@@ -50,6 +53,13 @@ public class MainFrame extends GUI {
         this.setVisible(true);
     }
 
+    private void gatherHits() {
+        ipDL = new IpDL (c);
+        ipDL.setConnections(Library.connectionL);
+        
+        
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -270,6 +280,11 @@ public class MainFrame extends GUI {
         jButton1.setText("Search");
 
         jButton3.setText("Gather");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -352,6 +367,11 @@ public class MainFrame extends GUI {
             }
         }
     }//GEN-LAST:event_editPartnerBtnActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        gatherHits();
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton delPartnerBtn;
     private javax.swing.JTextField domainF;

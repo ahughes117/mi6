@@ -7,7 +7,7 @@ import java.sql.Timestamp;
  *
  * @author alexhughes
  */
-public class Ip extends Entity {
+public class Ip extends Entity implements Comparable {
 
     private String ip;
     private String agent;
@@ -191,5 +191,23 @@ public class Ip extends Entity {
 
     public void setDateModified(Timestamp dateModified) {
         this.dateModified = dateModified;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        boolean equal;
+        Ip ip = (Ip) o;
+
+        if (this.ip.equals(ip.getIp()) && this.agent.equals(ip.getAgent())
+                && this.domain.equals(ip.getDomain())) {
+            equal = true;
+        } else {
+            equal = false;
+        }
+        if (equal) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 }
