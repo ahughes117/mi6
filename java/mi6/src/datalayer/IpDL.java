@@ -58,8 +58,7 @@ public class IpDL extends DataLayer {
         return entities;
     }
     
-    @Override
-    public ArrayList<Entity> search() throws SQLException {
+    public String prepareSearchQuery(String aSorting) {
         Ip ip = (Ip) e;
         
         String query = ""
@@ -129,10 +128,23 @@ public class IpDL extends DataLayer {
             query += " AND _dateModified LIKE '" + ip.getDateModified().toString() + "%' ";
         }
         
+        return query;
+    }
+    
+    @Override
+    public ArrayList<Entity> search() throws SQLException {
+        String query = prepareSearchQuery("");
+        
         ResultSet entityR = c.sendQuery(query);
         entities = resultSetToEntity(entityR);
         
         return entities;
+    }
+    
+    public ResultSet search(String aSorting) throws SQLException {
+        String query = prepareSearchQuery(aSorting);
+        
+        return c.sendQuery(query);
     }
     
     @Override

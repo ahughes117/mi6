@@ -29,8 +29,12 @@ public abstract class DataLayer {
     public abstract Entity fetch() throws SQLException;
 
     public abstract ArrayList<Entity> fetchList(String aSorting) throws SQLException;
-    
+
+    public abstract String prepareSearchQuery(String aSorting);
+
     public abstract ArrayList<Entity> search() throws SQLException;
+
+    public abstract ResultSet search(String aSorting) throws SQLException;
 
     public abstract int insert() throws SQLException;
 

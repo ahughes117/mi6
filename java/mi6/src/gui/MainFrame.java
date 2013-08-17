@@ -2,6 +2,7 @@ package gui;
 
 import datalayer.IpDL;
 import entities.Entity;
+import entities.Ip;
 import entities.Partner;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sql.Connector;
+import sun.net.util.IPAddressUtil;
 import util.Library;
 import util.MesDial;
 import util.StrVal;
@@ -21,8 +23,9 @@ import util.StrVal;
  */
 public class MainFrame extends GUI {
 
+    Ip ip;
     IpDL ipDL;
-    
+
     /**
      * Creates new form MainFrame
      */
@@ -37,8 +40,8 @@ public class MainFrame extends GUI {
         });
         try {
             ArrayList<Entity> partners = Library.loadPartnerList(c);
-            for(Entity e : partners) {
-                Partner p = (Partner)e;
+            for (Entity e : partners) {
+                Partner p = (Partner) e;
                 partnerCombo.addItem(p.getPartnerID() + " - " + p.getUrl());
             }
         } catch (SQLException ex) {
@@ -53,10 +56,49 @@ public class MainFrame extends GUI {
         this.setVisible(true);
     }
 
+    private void parseSearchParams() throws Exception {
+        ip = new Ip();
+
+        String ipS = ipF.getText();
+        if (!IPAddressUtil.isIPv4LiteralAddress(ipS)) {
+            MesDial.validIpError(this);
+            throw new Exception();
+        } else {
+            ip.setIp(ipS);
+        }
+
+        ip.setDomain(domainF.getText());
+
+        try {
+            int hits = Integer.parseInt(hitsF.getText());
+            ip.setHits(hits);
+        } catch (Exception e) {
+            MesDial.validIntError(this);
+            throw new Exception();
+        }
+
+        ip.setHostname(hostnameF.getText());
+
+        if (requestChk.isSelected()) {
+            ip.setRequest(1);
+        } else {
+            ip.setRequest(0);
+        }
+
+        ipS = requestF.getText();
+        if (!IPAddressUtil.isIPv4LiteralAddress(ipS)) {
+            MesDial.validIpError(this);
+            throw new Exception();
+        } else {
+            ip.setRequestSource(ipS);
+        }
+
+    }
+
     private void syncIpAddresses() {
-        ipDL = new IpDL (c);
+        ipDL = new IpDL(c);
         ipDL.setConnections(Library.connectionL);
-        
+
         try {
             ipDL.syncIps();
             MesDial.saveSuccess(this);
@@ -65,7 +107,25 @@ public class MainFrame extends GUI {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
+    private void search() {
+        boolean parsingSuccessful = true;
+
+        //getting the selected connection
+        String url = (String) partnerCombo.getSelectedItem();
+        Connector con = Library.getConnection(url);
+
+        try {
+            parseSearchParams();
+        } catch (Exception x) {
+            parsingSuccessful = false;
+        }
+
+        if (parsingSuccessful) {
+            ipDL = new IpDL(con, ip);
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -90,7 +150,7 @@ public class MainFrame extends GUI {
         jLabel2 = new javax.swing.JLabel();
         hostnameF = new javax.swing.JTextField();
         requestF = new javax.swing.JTextField();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        requestChk = new javax.swing.JCheckBox();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
@@ -148,7 +208,7 @@ public class MainFrame extends GUI {
 
         jLabel2.setText("Hostname:");
 
-        jCheckBox1.setText("Request:");
+        requestChk.setText("Request:");
 
         jLabel4.setText("Hits:");
 
@@ -161,7 +221,7 @@ public class MainFrame extends GUI {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox1)
+                    .addComponent(requestChk)
                     .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -197,7 +257,7 @@ public class MainFrame extends GUI {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(requestF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCheckBox1))
+                    .addComponent(requestChk))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
 
@@ -284,6 +344,11 @@ public class MainFrame extends GUI {
         jPanel6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         jButton1.setText("Search");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Gather");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -331,7 +396,7 @@ public class MainFrame extends GUI {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -361,7 +426,7 @@ public class MainFrame extends GUI {
 
     private void newPartnerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newPartnerBtnActionPerformed
         //if (!PartnerFrame.instanceAlive) {
-            new PartnerFrame(this, c, NIL);
+        new PartnerFrame(this, c, NIL);
         //}
     }//GEN-LAST:event_newPartnerBtnActionPerformed
 
@@ -378,6 +443,9 @@ public class MainFrame extends GUI {
         syncIpAddresses();
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        search();
+    }//GEN-LAST:event_jButton1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton delPartnerBtn;
     private javax.swing.JTextField domainF;
@@ -388,7 +456,6 @@ public class MainFrame extends GUI {
     private javax.swing.JTable ipTable;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -405,6 +472,7 @@ public class MainFrame extends GUI {
     private javax.swing.JButton newPartnerBtn;
     private javax.swing.JComboBox partnerCombo;
     private javax.swing.JProgressBar pb;
+    private javax.swing.JCheckBox requestChk;
     private javax.swing.JTextField requestF;
     private javax.swing.JComboBox sortingCombo;
     private javax.swing.JLabel statusL;

@@ -48,6 +48,10 @@ public class Ip extends Entity implements Comparable {
         this.dateCreated = dateCreated;
         this.dateModified = dateModified;
     }
+    
+    public Ip() {
+        
+    }
 
     public String getIp() {
         return ip;

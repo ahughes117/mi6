@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JComboBox;
 import sql.Connector;
 import sql.DBCredentials;
 
@@ -43,6 +42,19 @@ public class Library {
         return partners;
     }
     
+    public static Connector getConnection(String aUrl) {
+        Connector con = null;
+        
+        for(Connector c : connectionL) {
+            if(c.getCredentials().getURL().equalsIgnoreCase(aUrl)) {
+                con = c;
+                break;
+            }
+        }
+        
+        return con;
+    }
+    
     /**
      * Checks whether the credentials of a connection are valid
      * 
@@ -64,18 +76,5 @@ public class Library {
         }
         
         return successful;
-    }
-
-    /**
-     * Loads the combo that is used in order to sort the ips
-     *
-     * @param aCon
-     * @return
-     * @throws SQLException
-     */
-    public static JComboBox loadSortingCombo(Connector aCon) throws SQLException {
-        JComboBox sortingCombo = new JComboBox();
-
-        return sortingCombo;
     }
 }
