@@ -202,9 +202,16 @@ public class Ip extends Entity implements Comparable {
 
         int result;
         result = ipE.getIp().compareToIgnoreCase(this.getIp());
-        result += ipE.getDomain().compareToIgnoreCase(this.getDomain());
-        result += ipE.getAgent().compareToIgnoreCase(this.getAgent());
+        if (result != 0) {
+            return result;
+        }
 
+        result = ipE.getDomain().compareToIgnoreCase(this.getDomain());
+        if (result != 0) {
+            return result;
+        }
+
+        result = ipE.getAgent().compareToIgnoreCase(this.getAgent());
         return result;
     }
 }
