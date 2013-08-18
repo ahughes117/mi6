@@ -34,7 +34,7 @@ function acquire_ip_details($ip_addr) {
 
     $ip->ip = $ip_addr;
     $ip->agent = $_SERVER['HTTP_USER_AGENT'];
-    $ip->domain = $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+    $ip->domain = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
     $ip->hostname = gethostbyaddr($ip->ip);
 
