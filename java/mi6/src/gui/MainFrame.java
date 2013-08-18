@@ -23,8 +23,8 @@ import util.TableParser;
  */
 public class MainFrame extends GUI {
 
-    Ip ip;
-    IpDL ipDL;
+    private Ip ip;
+    private IpDL ipDL;
 
     /**
      * Creates new form MainFrame
@@ -54,34 +54,26 @@ public class MainFrame extends GUI {
             shutdown();
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
+        descR.setSelected(true);
+        advancedSearchBtn.setVisible(false);
+        statsBtn.setVisible(false);
 
         super.setFrameLocationCenter();
         this.setVisible(true);
     }
 
     private void parseSearchParams() throws Exception {
-        int hits = Entity.NIL;
         ip = new Ip();
 
         ip.setIp(ipF.getText());
         ip.setDomain(domainF.getText());
-
-        if (!hitsF.getText().equals("")) {
-            try {
-                hits = Integer.parseInt(hitsF.getText());
-            } catch (Exception e) {
-                MesDial.validIntError(this);
-                throw new Exception();
-            }
-        }
-
-        ip.setHits(hits);
+        ip.setCountry(countryF.getText());
         ip.setHostname(hostnameF.getText());
 
         if (requestChk.isSelected()) {
             ip.setRequest(1);
         } else {
-            ip.setRequest(0);
+            ip.setRequest(-1);
         }
 
         ip.setRequestSource(requestF.getText());
@@ -124,24 +116,39 @@ public class MainFrame extends GUI {
         } catch (Exception x) {
             parsingSuccessful = false;
         }
-
+        
         if (parsingSuccessful) {
             ipDL = new IpDL(con, ip);
             try {
                 String sorting = (String) sortingCombo.getSelectedItem();
-                if(descR.isSelected()) {
+                if (descR.isSelected()) {
                     sorting += " DESC ";
                 } else {
                     sorting += " ASC ";
                 }
                 
-                TableParser.fillTable(ipDL.search(sorting), ipTable);
-            } catch (SQLException ex) {
+                SearchWorker sw = new SearchWorker(ipTable, statusL, pb, ipDL, sorting);
+                sw.execute();
+                
+            } catch (Exception ex) {
                 MesDial.conError(this);
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         statusL.setText(ipTable.getRowCount() + " entries returned.");
+    }
+
+    @Override
+    protected void shutdown() {
+        try {
+            c.closeConnection();
+            for (Connector aC : Library.getConnections()) {
+                aC.closeConnection();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        super.shutdown();
     }
 
     /**
@@ -165,7 +172,7 @@ public class MainFrame extends GUI {
         jLabel1 = new javax.swing.JLabel();
         ipF = new javax.swing.JTextField();
         domainF = new javax.swing.JTextField();
-        hitsF = new javax.swing.JTextField();
+        countryF = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         hostnameF = new javax.swing.JTextField();
         requestF = new javax.swing.JTextField();
@@ -182,9 +189,11 @@ public class MainFrame extends GUI {
         delPartnerBtn = new javax.swing.JButton();
         descR = new javax.swing.JRadioButton();
         ascR = new javax.swing.JRadioButton();
+        advancedSearchBtn = new javax.swing.JToggleButton();
         jPanel6 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        searchBtn = new javax.swing.JButton();
+        syncBtn = new javax.swing.JButton();
+        statsBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("MI6 Tracker");
@@ -231,7 +240,7 @@ public class MainFrame extends GUI {
 
         requestChk.setText("Request:");
 
-        jLabel4.setText("Hits:");
+        jLabel4.setText("Country:");
 
         jLabel5.setText("Domain:");
 
@@ -250,7 +259,7 @@ public class MainFrame extends GUI {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(domainF)
-                    .addComponent(hitsF)
+                    .addComponent(countryF)
                     .addComponent(hostnameF)
                     .addComponent(ipF)
                     .addComponent(requestF, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE))
@@ -269,7 +278,7 @@ public class MainFrame extends GUI {
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(hitsF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(countryF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -279,7 +288,7 @@ public class MainFrame extends GUI {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(requestF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(requestChk))
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -312,6 +321,8 @@ public class MainFrame extends GUI {
         buttonGroup1.add(ascR);
         ascR.setText("ASC");
 
+        advancedSearchBtn.setText("Advanced Search");
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -334,7 +345,8 @@ public class MainFrame extends GUI {
                                 .addComponent(delPartnerBtn)))
                         .addGap(0, 46, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(advancedSearchBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(ascR)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(descR)))
@@ -358,7 +370,8 @@ public class MainFrame extends GUI {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(descR)
-                    .addComponent(ascR))
+                    .addComponent(ascR)
+                    .addComponent(advancedSearchBtn))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -367,33 +380,36 @@ public class MainFrame extends GUI {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, Short.MAX_VALUE))
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jPanel6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
-        jButton1.setText("Search");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        searchBtn.setText("Search");
+        searchBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                searchBtnActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Gather");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        syncBtn.setText("Sync");
+        syncBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                syncBtnActionPerformed(evt);
             }
         });
+
+        statsBtn.setText("Stats");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -401,17 +417,20 @@ public class MainFrame extends GUI {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(searchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(syncBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(statsBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton3))
+                    .addComponent(searchBtn)
+                    .addComponent(syncBtn)
+                    .addComponent(statsBtn))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -434,7 +453,7 @@ public class MainFrame extends GUI {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -463,13 +482,13 @@ public class MainFrame extends GUI {
     }// </editor-fold>//GEN-END:initComponents
 
     private void newPartnerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newPartnerBtnActionPerformed
-        //if (!PartnerFrame.instanceAlive) {
-        new PartnerFrame(this, c, NIL);
-        //}
+        if (!PartnerFrame.isInstanceAlive()) {
+            new PartnerFrame(this, c, NIL);
+        }
     }//GEN-LAST:event_newPartnerBtnActionPerformed
 
     private void editPartnerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editPartnerBtnActionPerformed
-        if (!PartnerFrame.instanceAlive) {
+        if (!PartnerFrame.isInstanceAlive() && partnerCombo.getSelectedIndex() != 0) {
             int partnerID = StrVal.parseIdFromString((String) partnerCombo.getSelectedItem());
             if (partnerID != -1) {
                 new PartnerFrame(this, c, partnerID);
@@ -477,26 +496,25 @@ public class MainFrame extends GUI {
         }
     }//GEN-LAST:event_editPartnerBtnActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void syncBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_syncBtnActionPerformed
         syncIpAddresses();
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_syncBtnActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBtnActionPerformed
         search();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_searchBtnActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToggleButton advancedSearchBtn;
     private javax.swing.JRadioButton ascR;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JTextField countryF;
     private javax.swing.JButton delPartnerBtn;
     private javax.swing.JRadioButton descR;
     private javax.swing.JTextField domainF;
     private javax.swing.JButton editPartnerBtn;
-    private javax.swing.JTextField hitsF;
     private javax.swing.JTextField hostnameF;
     private javax.swing.JTextField ipF;
     private javax.swing.JTable ipTable;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -515,7 +533,10 @@ public class MainFrame extends GUI {
     private javax.swing.JProgressBar pb;
     private javax.swing.JCheckBox requestChk;
     private javax.swing.JTextField requestF;
+    private javax.swing.JButton searchBtn;
     private javax.swing.JComboBox sortingCombo;
+    private javax.swing.JButton statsBtn;
     private javax.swing.JLabel statusL;
+    private javax.swing.JButton syncBtn;
     // End of variables declaration//GEN-END:variables
 }

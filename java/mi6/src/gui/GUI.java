@@ -18,7 +18,6 @@ import util.Library;
  */
 public abstract class GUI extends JFrame {
 
-    protected static boolean instanceAlive = false;
     protected GUI pFrame;
     protected Connector c;
     protected int id;
@@ -29,7 +28,6 @@ public abstract class GUI extends JFrame {
     }
 
     public GUI(GUI aPreviousFrame, Connector aConnector, int anID) {
-        instanceAlive = true;
         pFrame = aPreviousFrame;
         c = aConnector;
         id = anID;
@@ -52,16 +50,7 @@ public abstract class GUI extends JFrame {
     }
 
     protected void shutdown() {
-        instanceAlive = false;
         pFrame.setVisible(true);
-        try {
-            c.closeConnection();
-            for (Connector aC : Library.getConnections()) {
-                aC.closeConnection();
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
         this.dispose();
     }
 

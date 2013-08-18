@@ -88,6 +88,10 @@ public class IpDL extends DataLayer {
         if (ip.getHits() != Entity.NIL) {
             query += " AND Hits BETWEEN " + floor + " AND " + ceiling;
         }
+        
+        if(ip.getRequest() != Entity.NIL) {
+            query += " AND Request = " + ip.getRequest();
+        }
 
         if (ip.getHostname() != null && !ip.getHostname().equals("")) {
             query += " AND Hostname LIKE '%" + ip.getHostname() + "%' ";

@@ -21,14 +21,16 @@ import util.StrVal;
  */
 public class PartnerFrame extends GUI {
 
-    Partner p;
-    PartnerDL pdl;
+    private static boolean instanceAlive = false;
+    private Partner p;
+    private PartnerDL pdl;
 
     /**
      * Creates new form PartnerFrame
      */
     public PartnerFrame(GUI aPreviousFrame, Connector aConnector, int anID) {
         super(aPreviousFrame, aConnector, anID);
+        instanceAlive = true;
 
         initComponents();
         this.addWindowListener(new WindowAdapter() {
@@ -52,7 +54,7 @@ public class PartnerFrame extends GUI {
             dateL.setVisible(false);
             existing = false;
         }
-
+        
         super.setFrameLocationCenter();
         this.setVisible(true);
     }
@@ -127,6 +129,16 @@ public class PartnerFrame extends GUI {
             MesDial.conError(this);
         }
     }
+    
+    public static boolean isInstanceAlive() {
+        return instanceAlive;
+    }
+    
+    @Override
+    protected void shutdown() {
+        instanceAlive = false;
+        super.shutdown();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -196,7 +208,7 @@ public class PartnerFrame extends GUI {
                             .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(partnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(typeF)
+                    .addComponent(typeF, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
                     .addComponent(tableF)
                     .addComponent(urlF)
                     .addComponent(userF)
@@ -266,7 +278,7 @@ public class PartnerFrame extends GUI {
                 .addComponent(backBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(testBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(okBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
