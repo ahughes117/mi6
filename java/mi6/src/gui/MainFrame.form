@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <NonVisualComponents>
+    <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
+    </Component>
+  </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="0"/>
     <Property name="title" type="java.lang.String" value="MI6 Tracker"/>
@@ -113,7 +117,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jPanel6" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" pref="231" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="227" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -308,6 +312,12 @@
                                   </Group>
                                   <EmptySpace min="0" pref="46" max="32767" attributes="0"/>
                               </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <Component id="ascR" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="descR" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -329,6 +339,11 @@
                           <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="sortingCombo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="descR" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="ascR" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -355,7 +370,20 @@
                 <Component class="javax.swing.JComboBox" name="sortingCombo">
                   <Properties>
                     <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                      <StringArray count="0"/>
+                      <StringArray count="12">
+                        <StringItem index="0" value="ip"/>
+                        <StringItem index="1" value="agent"/>
+                        <StringItem index="2" value="domain"/>
+                        <StringItem index="3" value="Hits"/>
+                        <StringItem index="4" value="RequestSource"/>
+                        <StringItem index="5" value="Hostname"/>
+                        <StringItem index="6" value="City"/>
+                        <StringItem index="7" value="Region"/>
+                        <StringItem index="8" value="Country"/>
+                        <StringItem index="9" value="CountryCode"/>
+                        <StringItem index="10" value="DateCreated"/>
+                        <StringItem index="11" value="_dateModified"/>
+                      </StringArray>
                     </Property>
                   </Properties>
                 </Component>
@@ -378,6 +406,22 @@
                 <Component class="javax.swing.JButton" name="delPartnerBtn">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Delete"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JRadioButton" name="descR">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="buttonGroup1"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="DESC"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JRadioButton" name="ascR">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="buttonGroup1"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="ASC"/>
                   </Properties>
                 </Component>
               </SubComponents>

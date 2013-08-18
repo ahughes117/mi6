@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sql.Connector;
-import sun.net.util.IPAddressUtil;
 import util.Library;
 import util.MesDial;
 import util.StrVal;
+import util.TableParser;
 
 /**
  * The Main Frame of the application
@@ -39,11 +39,14 @@ public class MainFrame extends GUI {
             }
         });
         try {
+            partnerCombo.addItem("Central MI6 Database");
             ArrayList<Entity> partners = Library.loadPartnerList(c);
             for (Entity e : partners) {
                 Partner p = (Partner) e;
                 partnerCombo.addItem(p.getPartnerID() + " - " + p.getUrl());
             }
+            partnerCombo.setSelectedIndex(0);
+            statusL.setText(partnerCombo.getItemCount() - 1 + " partner databases loaded.");
         } catch (SQLException ex) {
             MesDial.conError(this);
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -57,26 +60,22 @@ public class MainFrame extends GUI {
     }
 
     private void parseSearchParams() throws Exception {
+        int hits = Entity.NIL;
         ip = new Ip();
 
-        String ipS = ipF.getText();
-        if (!IPAddressUtil.isIPv4LiteralAddress(ipS)) {
-            MesDial.validIpError(this);
-            throw new Exception();
-        } else {
-            ip.setIp(ipS);
-        }
-
+        ip.setIp(ipF.getText());
         ip.setDomain(domainF.getText());
 
-        try {
-            int hits = Integer.parseInt(hitsF.getText());
-            ip.setHits(hits);
-        } catch (Exception e) {
-            MesDial.validIntError(this);
-            throw new Exception();
+        if (!hitsF.getText().equals("")) {
+            try {
+                hits = Integer.parseInt(hitsF.getText());
+            } catch (Exception e) {
+                MesDial.validIntError(this);
+                throw new Exception();
+            }
         }
 
+        ip.setHits(hits);
         ip.setHostname(hostnameF.getText());
 
         if (requestChk.isSelected()) {
@@ -85,19 +84,19 @@ public class MainFrame extends GUI {
             ip.setRequest(0);
         }
 
-        ipS = requestF.getText();
-        if (!IPAddressUtil.isIPv4LiteralAddress(ipS)) {
-            MesDial.validIpError(this);
-            throw new Exception();
-        } else {
-            ip.setRequestSource(ipS);
-        }
+        ip.setRequestSource(requestF.getText());
 
     }
 
     private void syncIpAddresses() {
+        ArrayList<Connector> connections = new ArrayList();
+
         ipDL = new IpDL(c);
-        ipDL.setConnections(Library.connectionL);
+        for (Connector aC : Library.getConnections()) {
+            connections.add(aC);
+        }
+
+        ipDL.setConnections(connections);
 
         try {
             ipDL.syncIps();
@@ -110,10 +109,15 @@ public class MainFrame extends GUI {
 
     private void search() {
         boolean parsingSuccessful = true;
+        Connector con;
 
         //getting the selected connection
-        String url = (String) partnerCombo.getSelectedItem();
-        Connector con = Library.getConnection(url);
+        if (partnerCombo.getSelectedIndex() != 0) {
+            int pid = StrVal.parseIdFromString((String) partnerCombo.getSelectedItem());
+            con = Library.getConnection(pid);
+        } else {
+            con = c;
+        }
 
         try {
             parseSearchParams();
@@ -123,7 +127,21 @@ public class MainFrame extends GUI {
 
         if (parsingSuccessful) {
             ipDL = new IpDL(con, ip);
+            try {
+                String sorting = (String) sortingCombo.getSelectedItem();
+                if(descR.isSelected()) {
+                    sorting += " DESC ";
+                } else {
+                    sorting += " ASC ";
+                }
+                
+                TableParser.fillTable(ipDL.search(sorting), ipTable);
+            } catch (SQLException ex) {
+                MesDial.conError(this);
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+        statusL.setText(ipTable.getRowCount() + " entries returned.");
     }
 
     /**
@@ -135,6 +153,7 @@ public class MainFrame extends GUI {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         pb = new javax.swing.JProgressBar();
         statusL = new javax.swing.JLabel();
@@ -161,6 +180,8 @@ public class MainFrame extends GUI {
         newPartnerBtn = new javax.swing.JButton();
         editPartnerBtn = new javax.swing.JButton();
         delPartnerBtn = new javax.swing.JButton();
+        descR = new javax.swing.JRadioButton();
+        ascR = new javax.swing.JRadioButton();
         jPanel6 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -267,6 +288,8 @@ public class MainFrame extends GUI {
 
         jLabel6.setText("Sorting by:");
 
+        sortingCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ip", "agent", "domain", "Hits", "RequestSource", "Hostname", "City", "Region", "Country", "CountryCode", "DateCreated", "_dateModified" }));
+
         newPartnerBtn.setText("New");
         newPartnerBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -282,6 +305,12 @@ public class MainFrame extends GUI {
         });
 
         delPartnerBtn.setText("Delete");
+
+        buttonGroup1.add(descR);
+        descR.setText("DESC");
+
+        buttonGroup1.add(ascR);
+        ascR.setText("ASC");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -303,7 +332,12 @@ public class MainFrame extends GUI {
                                 .addComponent(editPartnerBtn)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(delPartnerBtn)))
-                        .addGap(0, 46, Short.MAX_VALUE)))
+                        .addGap(0, 46, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(ascR)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(descR)))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -321,6 +355,10 @@ public class MainFrame extends GUI {
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(sortingCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(descR)
+                    .addComponent(ascR))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -396,7 +434,7 @@ public class MainFrame extends GUI {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -447,7 +485,10 @@ public class MainFrame extends GUI {
         search();
     }//GEN-LAST:event_jButton1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton ascR;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton delPartnerBtn;
+    private javax.swing.JRadioButton descR;
     private javax.swing.JTextField domainF;
     private javax.swing.JButton editPartnerBtn;
     private javax.swing.JTextField hitsF;

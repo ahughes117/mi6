@@ -165,6 +165,7 @@ public class Connector {
 
     public void closeConnection() throws SQLException {
         connection.close();
+        System.out.println(credentials.getURL() + " || Connection Closed");
     }
 
     public DBCredentials getCredentials() {

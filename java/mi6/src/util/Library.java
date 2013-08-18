@@ -17,7 +17,8 @@ import sql.DBCredentials;
  */
 public class Library {
 
-    public static ArrayList<Connector> connectionL;
+    //public static ArrayList<Connector> connectionL;
+    public static ArrayList<Entity> partners;
 
     /**
      * Loads the combo with the agents that hold the ips
@@ -27,43 +28,55 @@ public class Library {
      * @throws SQLException
      */
     public static ArrayList<Entity> loadPartnerList(Connector aCon) throws SQLException, ClassNotFoundException {
-        ArrayList<Entity> partners;
-        
         PartnerDL pdl = new PartnerDL(aCon);
         partners = pdl.fetchList("Url ASC");
-        connectionL = new ArrayList();
 
         for (Entity e : partners) {
             Partner p = (Partner) e;
             Connector con = new Connector(new DBCredentials(p.getUrl(), p.getUser(), p.getPass(), p.getSchema()));
-            connectionL.add(con);
+            p.con = con;
         }
 
         return partners;
     }
-    
-    public static Connector getConnection(String aUrl) {
+
+    public static Connector getConnection(int aPartnerID) {
         Connector con = null;
-        
-        for(Connector c : connectionL) {
-            if(c.getCredentials().getURL().equalsIgnoreCase(aUrl)) {
-                con = c;
+
+        for (Entity e : partners) {
+            Partner p = (Partner) e;
+            if (aPartnerID == p.getPartnerID()) {
+                con = p.con;
                 break;
             }
         }
-        
         return con;
     }
     
     /**
-     * Checks whether the credentials of a connection are valid
+     * Returns an ArrayList with all the active connections of the partners
      * 
-     * @param cre
      * @return 
+     */
+    public static ArrayList<Connector> getConnections() {
+        ArrayList<Connector> connections = new ArrayList();
+        
+        for(Entity e : partners) {
+            Partner p = (Partner)e;
+            connections.add(p.con);
+        }
+        return connections;
+    }
+
+    /**
+     * Checks whether the credentials of a connection are valid
+     *
+     * @param cre
+     * @return
      */
     public static boolean testConnection(DBCredentials cre) {
         boolean successful;
-        
+
         try {
             Connector.testConnection(cre);
             successful = true;
@@ -74,7 +87,7 @@ public class Library {
             Logger.getLogger(Library.class.getName()).log(Level.SEVERE, null, ex);
             successful = false;
         }
-        
+
         return successful;
     }
 }

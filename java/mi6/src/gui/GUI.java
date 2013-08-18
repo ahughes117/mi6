@@ -1,42 +1,45 @@
-
 package gui;
 
+import entities.Entity;
+import entities.Partner;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sql.Connector;
+import util.Library;
 
 /**
  * The abstract GUI class for the frames.
- * 
+ *
  * @author Alex Hughes
  */
 public abstract class GUI extends JFrame {
-    
+
     protected static boolean instanceAlive = false;
     protected GUI pFrame;
     protected Connector c;
     protected int id;
     protected static final int NIL = -1;
     protected boolean existing;
-    
+
     public GUI() {
-        
     }
-    
+
     public GUI(GUI aPreviousFrame, Connector aConnector, int anID) {
         instanceAlive = true;
         pFrame = aPreviousFrame;
         c = aConnector;
         id = anID;
-        
+
         if (anID == this.NIL) {
             existing = false;
         } else {
             existing = true;
         }
     }
-    
 
     public void setFrameLocationCenter() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -47,14 +50,22 @@ public abstract class GUI extends JFrame {
 
         this.setLocation(windowX, windowY);
     }
-    
+
     protected void shutdown() {
         instanceAlive = false;
         pFrame.setVisible(true);
+        try {
+            c.closeConnection();
+            for (Connector aC : Library.getConnections()) {
+                aC.closeConnection();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.dispose();
     }
-    
- public void popupMenuField(JTextField aTf) {
+
+    public void popupMenuField(JTextField aTf) {
 
         JPopupMenu popupMenu = new JPopupMenu();
         ActionListener actionListener = new PopupActionListener(aTf);
@@ -72,7 +83,7 @@ public abstract class GUI extends JFrame {
         popupMenu.add(pasteMenuItem);
 
         aTf.setComponentPopupMenu(popupMenu);
-        
+
     }
 
     public void popupMenuArea(JTextArea aTa) {
@@ -95,6 +106,7 @@ public abstract class GUI extends JFrame {
         aTa.setComponentPopupMenu(popupMenu);
     }
 }
+
 class PopupActionListener implements ActionListener {
 
     private JTextField tf;
@@ -132,4 +144,3 @@ class PopupActionListener implements ActionListener {
         }
     }
 }
-

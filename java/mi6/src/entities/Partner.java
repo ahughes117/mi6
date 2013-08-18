@@ -1,6 +1,7 @@
 package entities;
 
 import java.sql.Timestamp;
+import sql.Connector;
 
 /**
  * The Partner Entity Class
@@ -18,6 +19,7 @@ public class Partner extends Entity {
     private String type;
     private Timestamp dateCreated;
     private Timestamp dateModified;
+    public Connector con;
 
     /**
      * Constructor for fetching partners
