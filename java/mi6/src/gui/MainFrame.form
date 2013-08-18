@@ -117,7 +117,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jPanel6" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" pref="222" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="218" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -251,10 +251,19 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="ipF">
+                  <Events>
+                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="ipFKeyPressed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JTextField" name="domainF">
+                  <Events>
+                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="domainFKeyPressed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JTextField" name="countryF">
+                  <Events>
+                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="countryFKeyPressed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel2">
                   <Properties>
@@ -262,8 +271,14 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="hostnameF">
+                  <Events>
+                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="hostnameFKeyPressed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JTextField" name="requestF">
+                  <Events>
+                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="requestFKeyPressed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="requestChk">
                   <Properties>

@@ -4,6 +4,7 @@ import datalayer.IpDL;
 import entities.Entity;
 import entities.Ip;
 import entities.Partner;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
@@ -116,7 +117,7 @@ public class MainFrame extends GUI {
         } catch (Exception x) {
             parsingSuccessful = false;
         }
-        
+
         if (parsingSuccessful) {
             ipDL = new IpDL(con, ip);
             try {
@@ -126,10 +127,10 @@ public class MainFrame extends GUI {
                 } else {
                     sorting += " ASC ";
                 }
-                
+
                 SearchWorker sw = new SearchWorker(ipTable, statusL, pb, ipDL, sorting);
                 sw.execute();
-                
+
             } catch (Exception ex) {
                 MesDial.conError(this);
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -236,7 +237,37 @@ public class MainFrame extends GUI {
 
         jLabel1.setText("ip:");
 
+        ipF.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                ipFKeyPressed(evt);
+            }
+        });
+
+        domainF.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                domainFKeyPressed(evt);
+            }
+        });
+
+        countryF.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                countryFKeyPressed(evt);
+            }
+        });
+
         jLabel2.setText("Hostname:");
+
+        hostnameF.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                hostnameFKeyPressed(evt);
+            }
+        });
+
+        requestF.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                requestFKeyPressed(evt);
+            }
+        });
 
         requestChk.setText("Request:");
 
@@ -453,7 +484,7 @@ public class MainFrame extends GUI {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -503,6 +534,36 @@ public class MainFrame extends GUI {
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBtnActionPerformed
         search();
     }//GEN-LAST:event_searchBtnActionPerformed
+
+    private void ipFKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_ipFKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            search();
+        }
+    }//GEN-LAST:event_ipFKeyPressed
+
+    private void domainFKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_domainFKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            search();
+        }
+    }//GEN-LAST:event_domainFKeyPressed
+
+    private void countryFKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_countryFKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            search();
+        }
+    }//GEN-LAST:event_countryFKeyPressed
+
+    private void hostnameFKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hostnameFKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            search();
+        }
+    }//GEN-LAST:event_hostnameFKeyPressed
+
+    private void requestFKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_requestFKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            search();
+        }
+    }//GEN-LAST:event_requestFKeyPressed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton advancedSearchBtn;
     private javax.swing.JRadioButton ascR;
