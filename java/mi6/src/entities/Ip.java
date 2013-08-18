@@ -48,9 +48,8 @@ public class Ip extends Entity implements Comparable {
         this.dateCreated = dateCreated;
         this.dateModified = dateModified;
     }
-    
+
     public Ip() {
-        
     }
 
     public String getIp() {
@@ -199,19 +198,13 @@ public class Ip extends Entity implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        boolean equal;
-        Ip ip = (Ip) o;
+        Ip ipE = (Ip) o;
 
-        if (this.ip.equals(ip.getIp()) && this.agent.equals(ip.getAgent())
-                && this.domain.equals(ip.getDomain())) {
-            equal = true;
-        } else {
-            equal = false;
-        }
-        if (equal) {
-            return -1;
-        } else {
-            return 0;
-        }
+        int result;
+        result = ipE.getIp().compareToIgnoreCase(this.getIp());
+        result += ipE.getDomain().compareToIgnoreCase(this.getDomain());
+        result += ipE.getAgent().compareToIgnoreCase(this.getAgent());
+
+        return result;
     }
 }

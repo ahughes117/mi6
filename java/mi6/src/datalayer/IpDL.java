@@ -320,6 +320,10 @@ public class IpDL extends DataLayer {
                     this.e = ip;
                     this.insert();
                     ipT.add(ip);
+                    
+                    //finally deleting the newly added one
+                    partnerIpDL = new IpDL(con, ip);
+                    partnerIpDL.delete();
                 } else {
                     //if the central repository already contains the ip, then we 
                     //update the hits
@@ -350,6 +354,11 @@ public class IpDL extends DataLayer {
                 + "UPDATE ip "
                 + "SET Hits = ? "
                 + "WHERE ip = ? AND domain = ? AND agent = ? ";
+        
+        String delQ = ""
+                + "DELETE "
+                + "FROM ip "
+                + "WHERE ip = ? AND domain = ? AND agent = ? ";
 
         //getting hits from central server
         ps = c.prepareStatement(selQ);
@@ -377,12 +386,11 @@ public class IpDL extends DataLayer {
             }
 
             //now setting them to be zero in order not to be counted again next time
-            ps = con.prepareStatement(updQ);
+            ps = con.prepareStatement(delQ);
 
-            ps.setInt(1, 0);
-            ps.setString(2, ip.getIp());
-            ps.setString(3, ip.getDomain());
-            ps.setString(4, ip.getAgent());
+            ps.setString(1, ip.getIp());
+            ps.setString(2, ip.getDomain());
+            ps.setString(3, ip.getAgent());
 
             ps.executeUpdate();
         }
