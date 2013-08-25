@@ -326,7 +326,10 @@ public class IpDL extends DataLayer {
                 if (statusL != null) {
                     String text = "Processing: " + ctr + "/" + partnerIpL.size() + " || " + ip.getIp() + " - "
                             + ip.getHostname() + " | " + ip.getDomain();
-                    statusL.setText(text.substring(0, 100));
+                    if (text != null && text.length() > 50) {
+                        text = text.substring(0, 50);
+                    }
+                    statusL.setText(text);
                 }
 
                 //if the central repository does not have the ip, then we insert it

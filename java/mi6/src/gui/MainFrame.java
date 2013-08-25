@@ -15,7 +15,6 @@ import sql.Connector;
 import util.Library;
 import util.MesDial;
 import util.StrVal;
-import util.TableParser;
 
 /**
  * The Main Frame of the application
