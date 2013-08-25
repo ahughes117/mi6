@@ -5,6 +5,7 @@ import entities.Ip;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.TreeSet;
+import javax.swing.JLabel;
 import sql.Connector;
 
 /**
@@ -15,6 +16,7 @@ import sql.Connector;
 public class IpDL extends DataLayer {
 
     private ArrayList<Connector> connections;
+    private JLabel statusL = null;
 
     public IpDL(Connector aConnector) {
         super(aConnector);
@@ -88,8 +90,8 @@ public class IpDL extends DataLayer {
         if (ip.getHits() != Entity.NIL) {
             query += " AND Hits BETWEEN " + floor + " AND " + ceiling;
         }
-        
-        if(ip.getRequest() != Entity.NIL) {
+
+        if (ip.getRequest() != Entity.NIL) {
             query += " AND Request = " + ip.getRequest();
         }
 
@@ -298,6 +300,8 @@ public class IpDL extends DataLayer {
      * @throws SQLException
      */
     public void syncIps() throws SQLException {
+        int ctr = 0;
+        int size = 0;
         TreeSet<Ip> ipT = new TreeSet();
 
         //first fetching the central addresses
@@ -312,15 +316,24 @@ public class IpDL extends DataLayer {
 
             //fetching ips for each partner
             ArrayList<Entity> partnerIpL = partnerIpDL.fetchList("ip ASC ");
+            ctr = 0;
             for (Entity partnerEnt : partnerIpL) {
+                ctr++;
+                size++;
                 Ip ip = (Ip) partnerEnt;
+
+                //updating status
+                if (statusL != null) {
+                    statusL.setText("Processing: " + ctr + "/" + partnerIpL.size() + " || " + ip.getIp() + " - "
+                            + ip.getHostname() + " | " + ip.getDomain());
+                }
 
                 //if the central repository does not have the ip, then we insert it
                 if (!ipT.contains(ip)) {
                     this.e = ip;
                     this.insert();
                     ipT.add(ip);
-                    
+
                     //finally deleting the newly added one
                     partnerIpDL = new IpDL(con, ip);
                     partnerIpDL.delete();
@@ -330,6 +343,10 @@ public class IpDL extends DataLayer {
                     addHits(ip);
                 }
             }
+        }
+        if (statusL != null) {
+            statusL.setText(size + " entries processed. ");
+            statusL = null;
         }
     }
 
@@ -354,7 +371,7 @@ public class IpDL extends DataLayer {
                 + "UPDATE ip "
                 + "SET Hits = ? "
                 + "WHERE ip = ? AND domain = ? AND agent = ? ";
-        
+
         String delQ = ""
                 + "DELETE "
                 + "FROM ip "
@@ -427,5 +444,9 @@ public class IpDL extends DataLayer {
 
     public ArrayList<Connector> getConnections() {
         return connections;
+    }
+
+    public void setStatusL(JLabel aLabel) {
+        statusL = aLabel;
     }
 }

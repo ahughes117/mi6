@@ -92,9 +92,12 @@ public class MainFrame extends GUI {
         ipDL.setConnections(connections);
 
         try {
-            ipDL.syncIps();
+            
+            SyncWorker sw = new SyncWorker(statusL, pb, ipDL);
+            sw.execute();
+            
             MesDial.saveSuccess(this);
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             MesDial.syncError(this);
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }

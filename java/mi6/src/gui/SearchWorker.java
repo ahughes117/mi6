@@ -48,14 +48,16 @@ public class SearchWorker extends SwingWorker {
         TableParser.fillTable(ipR, table);
         statusL.setText("Table Population Done");
 
-        //printing summary
+        //calculating time
         long endTime = System.nanoTime();
         double time = (double) (endTime - startTime);
         time /= 1000000000;
         
+        //printing summary
         DecimalFormat timeF = new DecimalFormat("#.###");
         statusL.setText(table.getRowCount() + " entries fetched in " + timeF.format(time) + " seconds.");
         progress.setIndeterminate(false);
+        table.setEnabled(true);
 
         return null;
     }
