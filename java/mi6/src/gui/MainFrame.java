@@ -96,7 +96,6 @@ public class MainFrame extends GUI {
             SyncWorker sw = new SyncWorker(statusL, pb, ipDL);
             sw.execute();
             
-            MesDial.saveSuccess(this);
         } catch (Exception ex) {
             MesDial.syncError(this);
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);

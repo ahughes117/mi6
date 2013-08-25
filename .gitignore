@@ -3,3 +3,5 @@
 /java/mi6/nbproject/private/
 /java/mi6/build/
 /java/mi6/*.dat
+/java/mi6/dist/*.dat
+/java/mi6/store/*.dat
