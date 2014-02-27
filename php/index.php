@@ -1,10 +1,11 @@
 <?php
-//remove for production version
+//Uncomment for DEBUG mode
 //error_reporting(E_ALL | E_STRICT);
 //ini_set("display_errors", "1");
 
-require_once('tracker.php');
-require_once('whois.php');
+require_once ('tracker.php');
+require_once ('whois.php');
+require_once ('alexa.php');
 ?>
 <html>
 
@@ -24,6 +25,10 @@ require_once('whois.php');
         <p>//Perform a whois lookup by entering an IP address or a domain name</p>
         <p><blockquote><input type="text" name="domain" id="domain" /> <input type="submit" name="submit" id="submit" value="GO!"/></blockquote></p>
 </form><br>
+<form id="alexa_form" name="alexa_form" method="post" action="">
+    <p>//Perform an alexa ranking search by entering a url</p>
+    <p><blockquote><input type="text" name="alexa" id="alexa"/> <input type="submit" name="submit" id="submit" value="GO!"/></blockquote></p>
+</form><br>
 <?php
 if (isset($_POST['ip'])) {
     echo "<p>//Below you can find the info you are looking for, brought to you by <a href='https://github.com/ahughes117/mi6' target='_blank'><strong>MI6 IP Tracker</strong></a></p>";
@@ -35,9 +40,8 @@ if (isset($_POST['ip'])) {
 
     echo "<p>//Your info is: </p>";
 }elseif (isset($_POST['domain'])) {
-    $domain = $_POST['domain'];
+    $domain = trim($_POST['domain']);
 
-    $domain = trim($domain);
     if (substr(strtolower($domain), 0, 7) == "http://")
         $domain = substr($domain, 7);
     if (substr(strtolower($domain), 0, 4) == "www.")
@@ -46,11 +50,22 @@ if (isset($_POST['ip'])) {
         $result = LookupIP($domain);
     } elseif (ValidateDomain($domain)) {
         $result = LookupDomain($domain);
-    }
-    else
+    } else
         die("Invalid Input!");
     echo "<p>//Below you can find the info you are looking for, brought to you by <a href='https://github.com/ahughes117/mi6' target='_blank'><strong>MI6 IP Tracker</strong></a></p>";
     echo "<p><blockquote><pre class='pre'>\n" . $result . "\n</pre>\n</blockquote></p>";
+
+    echo "<p>//Your info is: </p>";
+} elseif (isset($_POST['alexa'])) {
+    $alexa = trim($_POST['alexa']);
+
+    $xml = alexa_rank($alexa);
+    if($xml == null) {
+        $xml = array('RANK'=>'<i>Sorry, no information available... Blame the API...</i>');
+    }
+    
+    echo "<p>//Below you can find the info you are looking for, brought to you by <a href='https://github.com/ahughes117/mi6' target='_blank'><strong>MI6 IP Tracker</strong></a></p>";
+    echo "<p><blockquote><strong>Alexa Rank</strong>: {$xml['RANK']}</blockquote></p>";
     
     echo "<p>//Your info is: </p>";
 } else {
@@ -72,7 +87,7 @@ function print_ip($ip) {
 }
 ?>
 
-<p><br><i>Created and maintened by <a href="mailto:ahughes@ahughes.org">Alex Hughes</a>. Suggestions and contributions are always welcome. You know where you can <a href="http://ahughes.org" target="_blank">find me</a>.</i></p>
+<p><br><i>Created and maintened by <a href="mailto:ahughes@ahughes.org">Alex Hughes</a>. <a href="https://github.com/ahughes117/mi6/" target="_blank">Suggestions and contributions</a> are always welcome. You know where you can <a href="https://ahughes.org" target="_blank">find me</a>.</i></p>
 </body>
 </html>
 
